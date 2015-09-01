@@ -42,6 +42,25 @@ function lib.get_file_content(f)
   return content
 end
 
+function lib.return_big_file_content(fd)
+  ngx.header['Content-Type']='application/octet-stream'  
+
+  local size = fd:seek("end")
+  fd:seek("set", 0)
+  ngx.header['Content-Length'] = size
+  
+  while true do
+    -- read in blocks of 10MB
+    local bytes = fd:read( 10485760)
+    if not bytes then break end
+    ngx.print( bytes)
+    ngx.flush(true)
+  end
+  fd:close()
+  ngx.flush(true)
+  
+end
+
 
 -- thanks to: http://lua-users.org/wiki/BaseSixtyFour
 -- character table string
